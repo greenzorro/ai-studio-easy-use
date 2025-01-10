@@ -1,6 +1,6 @@
 # g-ai-studio-global-system-prompt
 
-Set global system prompt for Google AI Studio
+Set persist global system prompt for Google AI Studio
 
 自动设置Google AI Studio的系统提示词
 
