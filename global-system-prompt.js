@@ -18,7 +18,7 @@
 // ==UserScript==
 // @name         Google AI Studio 默认系统提示词
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.0.1
 // @description  自动设置Google AI Studio的系统提示词
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/prompts/*
