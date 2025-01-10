@@ -30,7 +30,7 @@
     'use strict';
 
     // 默认系统提示词
-    const DEFAULT_PROMPT = 'Always search in English. Answer in the same language as the question.';
+    const DEFAULT_PROMPT = '1. Answer in the same language as the question.\n2. If web search is necessary, always search in English.';
     
     // 从localStorage获取保存的提示词
     const getSavedPrompt = () => localStorage.getItem('aiStudioSystemPrompt') || DEFAULT_PROMPT;
