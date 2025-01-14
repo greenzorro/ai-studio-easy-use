@@ -1,12 +1,12 @@
 # g-ai-studio-global-system-prompt
 
-Make Google AI Studio easier to use
+**Make Google AI Studio easier to use**
 
 1. Automatically set Google AI Studio system prompt;
 2. Increase chat content font size;
 3. Toggle Grounding with Ctrl/Cmd + i.
 
-优化 Google AI Studio 使用体验
+**优化 Google AI Studio 使用体验**
 
 1. 自动设置 Google AI Studio 的系统提示词；
 2. 增大聊天内容字号；
