@@ -16,9 +16,9 @@
 // 找到class名为 "system-instructions" 的节点，找到里面的textarea，把textarea里的内容改为全局系统提示词
 
 // ==UserScript==
-// @name         Google AI Studio Utils
+// @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/prompts/*
