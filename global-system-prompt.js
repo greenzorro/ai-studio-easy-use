@@ -16,10 +16,10 @@
 // 找到class名为 "system-instructions" 的节点，找到里面的textarea，把textarea里的内容改为全局系统提示词
 
 // ==UserScript==
-// @name         Google AI Studio 默认系统提示词
+// @name         Google AI Studio Utils
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
-// @description  自动设置Google AI Studio的系统提示词
+// @version      1.0.2
+// @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/prompts/*
 // @grant        none
@@ -84,7 +84,7 @@
         `;
 
         const saveButton = document.createElement('button');
-        saveButton.textContent = '保存';
+        saveButton.textContent = 'Save';
         saveButton.style.cssText = `
             padding: 8px 16px;
             background-color: #4CAF50;
@@ -95,7 +95,7 @@
         `;
 
         const resetButton = document.createElement('button');
-        resetButton.textContent = '重置';
+        resetButton.textContent = 'Reset';
         resetButton.style.cssText = `
             padding: 8px 16px;
             background-color: #f8f9fa;
@@ -106,7 +106,7 @@
         `;
 
         const cancelButton = document.createElement('button');
-        cancelButton.textContent = '取消';
+        cancelButton.textContent = 'Cancel';
         cancelButton.style.cssText = `
             padding: 8px 16px;
             background-color: #f8f9fa;
@@ -204,6 +204,29 @@
                 document.body.removeChild(overlay);
             });
         });
+
+        // 添加样式覆盖
+        const style = document.createElement('style');
+        style.textContent = `
+            body:not(.dark-theme) ms-cmark-node p {
+                font-size: 16px !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 添加快捷键监听
+        document.documentElement.addEventListener('keydown', function(e) {
+            // 检查是否按下 cmd/ctrl + i
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+                e.preventDefault(); // 阻止默认行为
+                e.stopPropagation(); // 阻止事件冒泡
+                const searchToggle = document.querySelector('.search-input-toggle button');
+                if (searchToggle) {
+                    searchToggle.click();
+                }
+                return false; // 额外的事件阻止
+            }
+        }, true);
     };
 
     // 监听DOM变化，自动设置系统提示词
