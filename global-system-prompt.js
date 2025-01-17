@@ -8,7 +8,7 @@
  */
 
 // 写一个Tampermonkey脚本
-// 用在 https://aistudio.google.com/prompts/ 开头的网页
+// 用在 https://aistudio.google.com/*prompts/* 网页
 // 在页面上加一个链接，"Set Global System Prompt"
 // 点击链接出现弹窗，里面有个输入框，可以输入全局系统提示词，默认为：
 // Always search in English. Answer in the same language as the question.
@@ -18,10 +18,10 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.0.4
+// @version      1.0.5
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
-// @match        https://aistudio.google.com/prompts/*
+// @match        https://aistudio.google.com/*prompts/*
 // @grant        none
 // @license      MIT
 // ==/UserScript==
