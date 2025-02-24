@@ -39,7 +39,7 @@
             SYSTEM_INSTRUCTIONS: '.system-instructions',
             SYSTEM_TEXTAREA: '.system-instructions textarea',
             NEW_CHAT_LINK: 'a[href="/prompts/new_chat"]',
-            SEARCH_TOGGLE: '.search-input-toggle button',
+            SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
             CHAT_LINKS: '.nav-sub-items-wrapper a'
         },
         FONT_SIZES: [
