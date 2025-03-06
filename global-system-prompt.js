@@ -1,7 +1,7 @@
 /*
- * File: global-system-prompt.js
- * Project: g-ai-studio-global-system-prompt
- * Created: 2025-01-10 09:46:13
+ * File: ai-studio-easy-use.js
+ * Project: browser-scipts
+ * Created: 2025-03-03 10:46:13
  * Author: Victor Cheng
  * Email: greenzorromail@gmail.com
  * Description:
@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.0.9
+// @version      1.1.0
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -38,7 +38,7 @@
             NAVIGATION: '[role="navigation"]',
             SYSTEM_INSTRUCTIONS: '.system-instructions',
             SYSTEM_TEXTAREA: '.system-instructions textarea',
-            NEW_CHAT_LINK: 'a[href="/prompts/new_chat"]',
+            NEW_CHAT_LINK: 'a[href$="/prompts/new_chat"]',
             SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
             CHAT_LINKS: '.nav-sub-items-wrapper a'
         },
