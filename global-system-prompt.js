@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.1.1
+// @version      1.1.2
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -37,8 +37,9 @@
         },
         SELECTORS: {
             NAVIGATION: '[role="navigation"]',
-            SYSTEM_INSTRUCTIONS: '.system-instructions',
-            SYSTEM_TEXTAREA: '.system-instructions textarea',
+            SYSTEM_INSTRUCTIONS: '.toolbar-system-instructions',
+            SYSTEM_INSTRUCTIONS_BUTTON: 'button[aria-label="System instructions"]',
+            SYSTEM_TEXTAREA: '.toolbar-system-instructions textarea',
             NEW_CHAT_LINK: 'a[href$="/prompts/new_chat"]',
             SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
             CHAT_LINKS: '.nav-sub-items-wrapper a'
@@ -107,15 +108,30 @@
     }
 
     class SystemPromptManager {
-        static update(prompt) {
-            const systemInstructions = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_INSTRUCTIONS);
-            const textarea = systemInstructions?.querySelector('textarea');
+        static async update(prompt) {
+            const systemInstructionsButton = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_INSTRUCTIONS_BUTTON);
+            if (!systemInstructionsButton) {
+                console.warn("System instructions button not found.");
+                return false;
+            }
+
+            let textarea = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_TEXTAREA);
+            if (!textarea) {
+                systemInstructionsButton.click();
+                await new Promise(resolve => setTimeout(resolve, 200));
+                textarea = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_TEXTAREA);
+            }
+
             if (textarea) {
                 textarea.value = prompt;
                 textarea.dispatchEvent(new Event('input', {
                     bubbles: true,
                     cancelable: true,
                 }));
+                return true;
+            } else {
+                console.warn("System prompt textarea not found after clicking button.");
+                return false;
             }
         }
     }
@@ -607,16 +623,17 @@
                     continue;
                 }
 
-                const systemInstructions = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_INSTRUCTIONS);
-                const textarea = systemInstructions?.querySelector('textarea');
-
-                if (textarea?.spellcheck === true) {
-                    SystemPromptManager.update(prompt);
+                const success = await SystemPromptManager.update(prompt);
+                if (success) {
+                    console.log("System prompt updated successfully.");
                     return;
                 }
 
+                console.log(`Attempt ${i + 1} to set system prompt failed. Retrying...`);
                 await wait(interval);
             }
+
+            console.error(`Failed to set system prompt after ${maxRetries} attempts.`);
         }
 
         observeRouteChanges() {
