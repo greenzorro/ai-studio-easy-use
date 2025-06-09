@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.1.3
+// @version      1.1.4
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -100,7 +100,8 @@
         static updateFontSize(size) {
             const fontSize = CONSTANTS.FONT_SIZES.find(s => s.value === size)?.size || '14px';
             this.createStyleSheet('aiStudioCustomStyle', `
-                body:not(.dark-theme) ms-cmark-node p {
+                ms-cmark-node p,
+                ms-cmark-node code {
                     font-size: ${fontSize} !important;
                 }
             `);
