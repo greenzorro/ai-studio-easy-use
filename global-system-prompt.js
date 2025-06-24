@@ -105,6 +105,9 @@
                 ms-cmark-node code {
                     font-size: ${fontSize} !important;
                 }
+                .toolbar-system-instructions textarea {
+                    max-height: 80px !important;
+                }
             `);
         }
     }
@@ -125,11 +128,19 @@
             }
 
             if (textarea) {
+                // 检查现有内容，如果不为空且与全局提示词不同，则不覆盖
+                const existingContent = textarea.value.trim();
+                if (existingContent && existingContent !== prompt.trim()) {
+                    console.log("System prompt textarea already has different content, skipping update.");
+                    return true;
+                }
+
                 textarea.value = prompt;
                 textarea.dispatchEvent(new Event('input', {
                     bubbles: true,
                     cancelable: true,
                 }));
+                console.log("System prompt updated successfully.");
                 return true;
             } else {
                 console.warn("System prompt textarea not found after clicking button.");
@@ -178,8 +189,9 @@
     // 功能类
     //=======================================
     class ShortcutManager {
-        constructor() {
+        constructor(appManager) {
             this.currentChatIndex = 0;
+            this.appManager = appManager;
             this.bindGlobalShortcuts();
         }
 
@@ -221,11 +233,20 @@
             searchToggle?.click();
         }
 
-        createNewChat() {
+        async createNewChat() {
             const newChatLink = DOMUtils.querySelector(CONSTANTS.SELECTORS.NEW_CHAT_LINK);
             if (newChatLink) {
                 newChatLink.click();
                 this.currentChatIndex = 0;
+                
+                // 为新聊天页面添加额外的延迟处理，确保系统提示词能正确注入
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                if (this.appManager) {
+                    const settings = this.appManager.settingsManager.getSettings();
+                    this.appManager.initSystemPrompt(settings.systemPrompt);
+                    console.log("Applied system prompt for new chat created via shortcut.");
+                }
             }
         }
 
@@ -613,7 +634,7 @@
     class AppManager {
         constructor() {
             this.settingsManager = new SettingsManager();
-            this.shortcutManager = new ShortcutManager();
+            this.shortcutManager = new ShortcutManager(this);
             this.dialogManager = new DialogManager(this.settingsManager);
         }
 
