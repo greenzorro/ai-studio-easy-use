@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.1.4
+// @version      1.1.5
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -42,7 +42,8 @@
             SYSTEM_TEXTAREA: '.toolbar-system-instructions textarea',
             NEW_CHAT_LINK: 'a[href$="/prompts/new_chat"]',
             SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
-            CHAT_LINKS: '.history-items-wrapper a'
+            CHAT_LINKS: '.history-items-wrapper a',
+            HISTORY_MENU_BUTTON: '.history-label-wrapper button'
         },
         FONT_SIZES: [
             { value: 'small', label: 'Small', size: '12px' },
@@ -134,6 +135,42 @@
                 console.warn("System prompt textarea not found after clicking button.");
                 return false;
             }
+        }
+    }
+
+    class HistoryMenuManager {
+        static async expandHistoryMenu() {
+            const historyButton = DOMUtils.querySelector(CONSTANTS.SELECTORS.HISTORY_MENU_BUTTON);
+            if (historyButton) {
+                historyButton.click();
+                console.log("History menu expanded successfully.");
+                return true;
+            } else {
+                console.warn("History menu button not found.");
+                return false;
+            }
+        }
+
+        static async initHistoryMenuExpansion(maxRetries = 10, interval = 1000) {
+            const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            for (let i = 0; i < maxRetries; i++) {
+                if (document.readyState !== 'complete') {
+                    await wait(interval);
+                    continue;
+                }
+
+                const success = await this.expandHistoryMenu();
+                if (success) {
+                    console.log("History menu expansion completed.");
+                    return;
+                }
+
+                console.log(`Attempt ${i + 1} to expand history menu failed. Retrying...`);
+                await wait(interval);
+            }
+
+            console.error(`Failed to expand history menu after ${maxRetries} attempts.`);
         }
     }
 
@@ -583,6 +620,7 @@
         init() {
             this.initSettingsLink();
             this.applyInitialSettings();
+            this.initHistoryMenuExpansion();
             this.observeRouteChanges();
         }
 
@@ -635,6 +673,14 @@
             }
 
             console.error(`Failed to set system prompt after ${maxRetries} attempts.`);
+        }
+
+        initHistoryMenuExpansion() {
+            // 只在页面首次加载时执行一次，避免在路由切换时重复展开
+            if (!this.historyMenuExpanded) {
+                HistoryMenuManager.initHistoryMenuExpansion();
+                this.historyMenuExpanded = true;
+            }
         }
 
         observeRouteChanges() {
