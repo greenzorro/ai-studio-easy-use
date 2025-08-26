@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.1.7
+// @version      1.1.8
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -33,10 +33,11 @@
         },
         DEFAULTS: {
             SYSTEM_PROMPT: '1. Answer in the same language as the question.\n2. If web search is necessary, always search in English.',
-            FONT_SIZE: 'medium'
+            FONT_SIZE: 'medium',
+            LINE_HEIGHT: '1.4'
         },
         SELECTORS: {
-            NAVIGATION: '.desktop-nav',
+            SETTINGS_CONTAINER: 'a[href$="/"]',
             SYSTEM_INSTRUCTIONS: '.toolbar-system-instructions',
             SYSTEM_INSTRUCTIONS_BUTTON: 'button[aria-label="System instructions"]',
             SYSTEM_TEXTAREA: '.toolbar-system-instructions textarea',
@@ -104,6 +105,7 @@
                 ms-cmark-node p,
                 ms-cmark-node code {
                     font-size: ${fontSize} !important;
+                    line-height: ${CONSTANTS.DEFAULTS.LINE_HEIGHT} !important;
                 }
                 .toolbar-system-instructions textarea {
                     max-height: 80px !important;
@@ -654,10 +656,13 @@
 
         observeNavigation(link) {
             const observer = new MutationObserver((_, obs) => {
-                const nav = DOMUtils.querySelector(CONSTANTS.SELECTORS.NAVIGATION);
-                if (nav && !nav.querySelector('.easy-use-settings')) {
+                const targetElement = DOMUtils.querySelector(CONSTANTS.SELECTORS.SETTINGS_CONTAINER);
+                const parentElement = targetElement?.parentElement;
+                const grandParentElement = parentElement?.parentElement;
+                
+                if (targetElement && parentElement && grandParentElement && !grandParentElement.querySelector('.easy-use-settings')) {
                     link.classList.add('easy-use-settings');
-                    nav.insertBefore(link, nav.firstChild);
+                    grandParentElement.insertBefore(link, parentElement.nextSibling);
                     obs.disconnect();
                 }
             });
