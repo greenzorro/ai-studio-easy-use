@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.1.8
+// @version      1.1.9
 // @description  Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -37,14 +37,18 @@
             LINE_HEIGHT: '1.4'
         },
         SELECTORS: {
+            // 设置弹窗
             SETTINGS_CONTAINER: 'a[href$="/"]',
-            SYSTEM_INSTRUCTIONS: '.toolbar-system-instructions',
-            SYSTEM_INSTRUCTIONS_BUTTON: 'button[aria-label="System instructions"]',
-            SYSTEM_TEXTAREA: '.toolbar-system-instructions textarea',
-            NEW_CHAT_LINK: 'a[href$="/prompts/new_chat"]',
-            SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
+            // 对话切换
+            HISTORY_MENU_BUTTON: 'a[href$="/library"] + button',
             CHAT_LINKS: 'a[href^="/prompts/"]:not([href*="new_chat"])',
-            HISTORY_MENU_BUTTON: 'a[href$="/library"] + button'
+            NEW_CHAT_LINK: 'a[href$="/prompts/new_chat"]',
+            // 系统提示词
+            SYSTEM_INSTRUCTIONS_BUTTON: 'button[aria-label="System instructions"]',
+            SYSTEM_TEXTAREA: '.cdk-overlay-container textarea',
+            CLOSE_PANEL_BUTTON: 'button[aria-label="Close panel"]',
+            // 功能选项
+            SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
         },
         FONT_SIZES: [
             { value: 'small', label: 'Small', size: '12px' },
@@ -107,15 +111,18 @@
                     font-size: ${fontSize} !important;
                     line-height: ${CONSTANTS.DEFAULTS.LINE_HEIGHT} !important;
                 }
-                .toolbar-system-instructions textarea {
-                    max-height: 80px !important;
-                }
             `);
         }
     }
 
     class SystemPromptManager {
         static async update(prompt) {
+            // 只在URL包含new_chat时处理系统提示词
+            if (!window.location.href.includes('new_chat')) {
+                console.log("Not a new chat, skipping system prompt update.");
+                return true;
+            }
+
             const systemInstructionsButton = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_INSTRUCTIONS_BUTTON);
             if (!systemInstructionsButton) {
                 console.warn("System instructions button not found.");
@@ -123,10 +130,13 @@
             }
 
             let textarea = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_TEXTAREA);
+            let panelWasOpened = false;
+            
             if (!textarea) {
                 systemInstructionsButton.click();
                 await new Promise(resolve => setTimeout(resolve, 200));
                 textarea = DOMUtils.querySelector(CONSTANTS.SELECTORS.SYSTEM_TEXTAREA);
+                panelWasOpened = true;
             }
 
             if (textarea) {
@@ -134,6 +144,10 @@
                 const existingContent = textarea.value.trim();
                 if (existingContent && existingContent !== prompt.trim()) {
                     console.log("System prompt textarea already has different content, skipping update.");
+                    // 如果是我们打开的面板，需要关闭它
+                    if (panelWasOpened) {
+                        await this.closePanel();
+                    }
                     return true;
                 }
 
@@ -143,9 +157,28 @@
                     cancelable: true,
                 }));
                 console.log("System prompt updated successfully.");
+                
+                // 等待0.5秒后关闭面板
+                if (panelWasOpened) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await this.closePanel();
+                }
+                
                 return true;
             } else {
                 console.warn("System prompt textarea not found after clicking button.");
+                return false;
+            }
+        }
+        
+        static async closePanel() {
+            const closeButton = DOMUtils.querySelector(CONSTANTS.SELECTORS.CLOSE_PANEL_BUTTON);
+            if (closeButton) {
+                closeButton.click();
+                console.log("System instructions panel closed.");
+                return true;
+            } else {
+                console.warn("Close panel button not found.");
                 return false;
             }
         }
@@ -241,14 +274,10 @@
                 newChatLink.click();
                 this.currentChatIndex = 0;
                 
-                // 为新聊天页面添加额外的延迟处理，确保系统提示词能正确注入
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                if (this.appManager) {
-                    const settings = this.appManager.settingsManager.getSettings();
-                    this.appManager.initSystemPrompt(settings.systemPrompt);
-                    console.log("Applied system prompt for new chat created via shortcut.");
-                }
+                // 创建新聊天后，系统提示词的处理会由路由变化监听自动处理
+                // 这里只需要等待页面跳转完成即可
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                console.log("New chat created via shortcut, system prompt will be handled automatically.");
             }
         }
 
@@ -638,6 +667,7 @@
             this.settingsManager = new SettingsManager();
             this.shortcutManager = new ShortcutManager(this);
             this.dialogManager = new DialogManager(this.settingsManager);
+            this.historyMenuExpanded = false;
         }
 
         init() {
@@ -676,7 +706,11 @@
         applyInitialSettings() {
             const settings = this.settingsManager.getSettings();
             StyleManager.updateFontSize(settings.fontSize);
-            this.initSystemPrompt(settings.systemPrompt);
+            
+            // 只在new_chat页面初始化系统提示词
+            if (window.location.href.includes('new_chat')) {
+                this.initSystemPrompt(settings.systemPrompt);
+            }
         }
 
         async initSystemPrompt(prompt, maxRetries = 10, interval = 1000) {
@@ -715,7 +749,14 @@
                 const url = location.href;
                 if (url !== lastUrl) {
                     lastUrl = url;
-                    this.applyInitialSettings();
+                    // 只在进入新对话页面时应用初始设置
+                    if (url.includes('new_chat')) {
+                        this.applyInitialSettings();
+                    } else {
+                        // 对于非新对话页面，只应用字体设置
+                        const settings = this.settingsManager.getSettings();
+                        StyleManager.updateFontSize(settings.fontSize);
+                    }
                 }
             });
 
