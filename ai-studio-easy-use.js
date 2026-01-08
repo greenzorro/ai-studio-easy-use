@@ -3,7 +3,7 @@
  * Project: browser-scipts
  * Created: 2025-03-03 10:46:13
  * Author: Victor Cheng
- * Email: greenzorromail@gmail.com
+ * Email: hi@victor42.work
  * Description:
  */
 
