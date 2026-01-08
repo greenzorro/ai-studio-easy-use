@@ -1,4 +1,4 @@
-# g-ai-studio-global-system-prompt
+# ai-studio-easy-use
 
 [⏬ Tampermonkey Script](https://greasyfork.org/en/scripts/523344-google-ai-studio-easy-use)
 
