@@ -37,7 +37,3 @@ node_modules/
 # Package manager locks (optional, uncomment if needed)
 # package-lock.json
 # yarn.lock
-
-# Extension output (generated files)
-**/extension/
-**/store_assets/
