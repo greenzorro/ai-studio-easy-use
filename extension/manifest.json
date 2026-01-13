@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Google AI Studio easy use",
   "version": "1.1.9",
-  "description": "Automatically set Google AI Studio system prompt; Increase chat content font size; Toggle Grounding with Ctrl/Cmd + i. 自动设置 Google AI Studio 的系统提示词；增大聊天内容字号；快捷键 Ctrl/Cmd + i 开关Grounding。",
+  "description": "Set AI Studio system prompt; increase chat font; toggle Grounding with Ctrl/Cmd + i",
   "content_scripts": [
     {
       "matches": [
