@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.1.9
+// @version      1.2.0
 // @description  Set AI Studio system prompt; increase chat font; toggle Grounding with Ctrl/Cmd + i
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -302,7 +302,7 @@
                     color: '#076eff',
                     textDecoration: 'none',
                     fontSize: '14px',
-                    marginBottom: '20px',
+                    margin: '0 15px 10px',
                     cursor: 'pointer'
                 }
             );
@@ -689,10 +689,12 @@
                 const targetElement = DOMUtils.querySelector(CONSTANTS.SELECTORS.SETTINGS_CONTAINER);
                 const parentElement = targetElement?.parentElement;
                 const grandParentElement = parentElement?.parentElement;
-                
-                if (targetElement && parentElement && grandParentElement && !grandParentElement.querySelector('.easy-use-settings')) {
+                const greatGrandParentElement = grandParentElement?.parentElement;
+
+                if (targetElement && parentElement && grandParentElement && greatGrandParentElement &&
+                    !greatGrandParentElement.querySelector('.easy-use-settings')) {
                     link.classList.add('easy-use-settings');
-                    grandParentElement.insertBefore(link, parentElement.nextSibling);
+                    greatGrandParentElement.insertBefore(link, grandParentElement.nextSibling);
                     obs.disconnect();
                 }
             });

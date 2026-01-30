@@ -291,7 +291,7 @@
                     color: '#076eff',
                     textDecoration: 'none',
                     fontSize: '14px',
-                    marginBottom: '20px',
+                    margin: '0 15px 10px',
                     cursor: 'pointer'
                 }
             );
@@ -678,10 +678,12 @@
                 const targetElement = DOMUtils.querySelector(CONSTANTS.SELECTORS.SETTINGS_CONTAINER);
                 const parentElement = targetElement?.parentElement;
                 const grandParentElement = parentElement?.parentElement;
-                
-                if (targetElement && parentElement && grandParentElement && !grandParentElement.querySelector('.easy-use-settings')) {
+                const greatGrandParentElement = grandParentElement?.parentElement;
+
+                if (targetElement && parentElement && grandParentElement && greatGrandParentElement &&
+                    !greatGrandParentElement.querySelector('.easy-use-settings')) {
                     link.classList.add('easy-use-settings');
-                    grandParentElement.insertBefore(link, parentElement.nextSibling);
+                    greatGrandParentElement.insertBefore(link, grandParentElement.nextSibling);
                     obs.disconnect();
                 }
             });

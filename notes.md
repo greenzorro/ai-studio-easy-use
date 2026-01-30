@@ -99,7 +99,19 @@ LINE_HEIGHT: '1.4'
 **关键选择器**:
 - `SETTINGS_CONTAINER: 'a[href$="/"]'` - 设置链接的定位基准
 
-**插入位置**: 设置入口插入到基准元素的**上级元素的同级位置**，而非导航栏开头
+**插入位置**: 设置入口插入到基准元素的**上级元素的上级元素之后**（greatGrandParentElement），作为 grandParentElement 的下一个兄弟
+
+**DOM 结构图**:
+```
+greatGrandParentElement
+  ├── grandParentElement
+  │    └── parentElement
+  │         └── targetElement (a[href$="/"] 设置链接)
+  │
+  ⚙️ Easy use settings ← .easy-use-settings 插入到这里（grandParentElement 的下一个兄弟）
+```
+
+**样式**: `margin: 0 15px 10px`
 
 #### 2.2.4 `ShortcutManager` - 快捷键管理器
 
