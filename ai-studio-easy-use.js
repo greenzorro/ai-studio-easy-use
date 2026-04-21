@@ -10,7 +10,7 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.2.0
+// @version      1.2.1
 // @description  Set AI Studio system prompt; increase chat font; toggle Grounding with Ctrl/Cmd + i
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
@@ -37,11 +37,9 @@
             LINE_HEIGHT: '1.4'
         },
         SELECTORS: {
-            // 设置弹窗
-            SETTINGS_CONTAINER: 'a[href$="/"]',
-            // 对话切换
-            HISTORY_MENU_BUTTON: 'a[href$="/library"] + button',
-            CHAT_LINKS: 'a[href^="/prompts/"]:not([href*="new_chat"])',
+            // 设置弹窗容器
+            SETTINGS_CONTAINER: 'ms-nav-items-v2',
+            // 对话相关
             NEW_CHAT_LINK: 'a[href$="/prompts/new_chat"]',
             // 系统提示词
             SYSTEM_INSTRUCTIONS_BUTTON: 'button[aria-label="System instructions"]',
@@ -59,8 +57,7 @@
         ],
         SHORTCUTS: {
             TOGGLE_GROUNDING: { key: 'i', requiresCmd: true },
-            NEW_CHAT: { key: 'j', requiresCmd: true },
-            SWITCH_CHAT: { key: '/', requiresCmd: true }
+            NEW_CHAT: { key: 'j', requiresCmd: true }
         }
     };
 
@@ -184,48 +181,11 @@
         }
     }
 
-    class HistoryMenuManager {
-        static async expandHistoryMenu() {
-            const historyButton = DOMUtils.querySelector(CONSTANTS.SELECTORS.HISTORY_MENU_BUTTON);
-            if (historyButton) {
-                historyButton.click();
-                console.log("History menu expanded successfully.");
-                return true;
-            } else {
-                console.warn("History menu button not found.");
-                return false;
-            }
-        }
-
-        static async initHistoryMenuExpansion(maxRetries = 10, interval = 1000) {
-            const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-            for (let i = 0; i < maxRetries; i++) {
-                if (document.readyState !== 'complete') {
-                    await wait(interval);
-                    continue;
-                }
-
-                const success = await this.expandHistoryMenu();
-                if (success) {
-                    console.log("History menu expansion completed.");
-                    return;
-                }
-
-                console.log(`Attempt ${i + 1} to expand history menu failed. Retrying...`);
-                await wait(interval);
-            }
-
-            console.error(`Failed to expand history menu after ${maxRetries} attempts.`);
-        }
-    }
-
     //=======================================
     // 功能类
     //=======================================
     class ShortcutManager {
         constructor(appManager) {
-            this.currentChatIndex = 0;
             this.appManager = appManager;
             this.bindGlobalShortcuts();
         }
@@ -257,9 +217,6 @@
                 case 'NEW_CHAT':
                     this.createNewChat();
                     break;
-                case 'SWITCH_CHAT':
-                    this.switchToNextChat();
-                    break;
             }
         }
 
@@ -272,20 +229,11 @@
             const newChatLink = DOMUtils.querySelector(CONSTANTS.SELECTORS.NEW_CHAT_LINK);
             if (newChatLink) {
                 newChatLink.click();
-                this.currentChatIndex = 0;
                 
                 // 创建新聊天后，系统提示词的处理会由路由变化监听自动处理
                 // 这里只需要等待页面跳转完成即可
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 console.log("New chat created via shortcut, system prompt will be handled automatically.");
-            }
-        }
-
-        switchToNextChat() {
-            const chatLinks = DOMUtils.querySelectorAll(CONSTANTS.SELECTORS.CHAT_LINKS);
-            if (chatLinks.length > 0) {
-                chatLinks[this.currentChatIndex].click();
-                this.currentChatIndex = (this.currentChatIndex + 1) % chatLinks.length;
             }
         }
     }
@@ -333,8 +281,7 @@
             // 创建快捷键列表
             const shortcuts = [
                 { key: 'Ctrl/Cmd + i', description: 'Toggle Grounding' },
-                { key: 'Ctrl/Cmd + j', description: 'New Chat' },
-                { key: 'Ctrl/Cmd + /', description: 'Switch Recent Chats' }
+                { key: 'Ctrl/Cmd + j', description: 'New Chat' }
             ];
 
             shortcuts.forEach(({ key, description }) => {
@@ -667,13 +614,11 @@
             this.settingsManager = new SettingsManager();
             this.shortcutManager = new ShortcutManager(this);
             this.dialogManager = new DialogManager(this.settingsManager);
-            this.historyMenuExpanded = false;
         }
 
         init() {
             this.initSettingsLink();
             this.applyInitialSettings();
-            this.initHistoryMenuExpansion();
             this.observeRouteChanges();
         }
 
@@ -686,15 +631,12 @@
 
         observeNavigation(link) {
             const observer = new MutationObserver((_, obs) => {
-                const targetElement = DOMUtils.querySelector(CONSTANTS.SELECTORS.SETTINGS_CONTAINER);
-                const parentElement = targetElement?.parentElement;
-                const grandParentElement = parentElement?.parentElement;
-                const greatGrandParentElement = grandParentElement?.parentElement;
+                const targetContainer = DOMUtils.querySelector(CONSTANTS.SELECTORS.SETTINGS_CONTAINER);
 
-                if (targetElement && parentElement && grandParentElement && greatGrandParentElement &&
-                    !greatGrandParentElement.querySelector('.easy-use-settings')) {
+                if (targetContainer && !targetContainer.querySelector('.easy-use-settings')) {
                     link.classList.add('easy-use-settings');
-                    greatGrandParentElement.insertBefore(link, grandParentElement.nextSibling);
+                    // 插入到容器的最开头
+                    targetContainer.insertBefore(link, targetContainer.firstChild);
                     obs.disconnect();
                 }
             });
@@ -735,14 +677,6 @@
             }
 
             console.error(`Failed to set system prompt after ${maxRetries} attempts.`);
-        }
-
-        initHistoryMenuExpansion() {
-            // 只在页面首次加载时执行一次，避免在路由切换时重复展开
-            if (!this.historyMenuExpanded) {
-                HistoryMenuManager.initHistoryMenuExpansion();
-                this.historyMenuExpanded = true;
-            }
         }
 
         observeRouteChanges() {
