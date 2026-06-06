@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Google AI Studio easy use",
-  "version": "1.2.1",
-  "description": "Set AI Studio system prompt; increase chat font; toggle Grounding with Ctrl/Cmd + i",
+  "version": "1.2.2",
+  "description": "Set AI Studio system prompt; increase chat font; toggle Grounding and URL context with Ctrl/Cmd + i",
   "content_scripts": [
     {
       "matches": [

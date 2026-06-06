@@ -15,7 +15,7 @@
 Google AI Studio 官方客户端存在以下痛点：
 - 新建对话时需要重复设置系统提示词
 - 聊天内容字号固定，长时间使用易疲劳
-- 网页搜索 (Grounding) 开关操作繁琐
+- 网页搜索 (Grounding) 和 URL context 开关操作繁琐
 
 本脚本通过自动化和 UI 增强解决上述问题。
 
@@ -99,7 +99,7 @@ class AppManager {
 **快捷键映射**:
 | 快捷键 | 功能 | 触发条件 |
 |--------|------|----------|
-| `Ctrl/Cmd + i` | 开关 Grounding | 全局 |
+| `Ctrl/Cmd + i` | 开关 Grounding 和 URL context | 全局 |
 | `Ctrl/Cmd + j` | 创建新聊天 | 全局 |
 
 **注**: 原有的 `Ctrl/Cmd + /` (历史对话切换) 已于 v1.2.1 移除，以避免与官方搜索快捷键冲突。
@@ -112,6 +112,7 @@ class AppManager {
 - **URL 检测**: 只在 URL 包含 `new_chat` 时生效
 - **智能覆盖**: 检测输入框现有内容，避免覆盖用户已输入的自定义提示词
 - **自动清理**: 如果输入框内容与全局提示词不同，不执行注入
+- **自动开启工具**: 全局系统提示词注入完成后，确保 Grounding 和 URL context 处于开启状态
 
 #### 2.2.6 `StyleManager` - 样式管理器
 
@@ -133,7 +134,8 @@ class AppManager {
 | `NEW_CHAT_LINK` | `a[href$="/prompts/new_chat"]` | 新建对话链接 | 高 (路由模式) |
 | `SYSTEM_INSTRUCTIONS_BUTTON` | `button[aria-label="System instructions"]` | 系统提示词按钮 | 中 (依赖 aria-label) |
 | `SYSTEM_TEXTAREA` | `.cdk-overlay-container textarea` | 系统提示词输入框 | 中 (Angular CDK 结构) |
-| `SEARCH_TOGGLE` | `.search-as-a-tool-toggle button` | 网页搜索开关 | 中 (功能特定类名) |
+| `SEARCH_TOGGLE` | `button[aria-label="Grounding with Google Search"]` | 网页搜索开关 | 中 (依赖 aria-label) |
+| `URL_CONTEXT_TOGGLE` | `button[aria-label="Browse the url context"]` | URL context 开关 | 中 (依赖 aria-label) |
 
 ---
 

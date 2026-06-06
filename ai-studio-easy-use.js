@@ -10,8 +10,8 @@
 // ==UserScript==
 // @name         Google AI Studio easy use
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
-// @description  Set AI Studio system prompt; increase chat font; toggle Grounding with Ctrl/Cmd + i
+// @version      1.2.2
+// @description  Set AI Studio system prompt; increase chat font; toggle Grounding and URL context with Ctrl/Cmd + i
 // @author       Victor Cheng
 // @match        https://aistudio.google.com/*
 // @match        https://ai.dev/*
@@ -46,7 +46,8 @@
             SYSTEM_TEXTAREA: '.cdk-overlay-container textarea',
             CLOSE_PANEL_BUTTON: 'button[aria-label="Close panel"]',
             // 功能选项
-            SEARCH_TOGGLE: '.search-as-a-tool-toggle button',
+            SEARCH_TOGGLE: 'button[aria-label="Grounding with Google Search"]',
+            URL_CONTEXT_TOGGLE: 'button[aria-label="Browse the url context"]',
         },
         FONT_SIZES: [
             { value: 'small', label: 'Small', size: '12px' },
@@ -112,6 +113,48 @@
         }
     }
 
+    class FeatureToggleManager {
+        static isEnabled(button) {
+            const stateAttributes = ['aria-checked', 'aria-pressed', 'aria-selected'];
+
+            for (const attribute of stateAttributes) {
+                const value = button.getAttribute(attribute);
+                if (value === 'true') return true;
+                if (value === 'false') return false;
+            }
+
+            const relatedInput = button.querySelector('input') || button.closest('label')?.querySelector('input');
+            if (relatedInput?.checked !== undefined) {
+                return relatedInput.checked;
+            }
+
+            const checkedContainer = button.closest('.mat-mdc-slide-toggle-checked, .mdc-switch--selected, .mat-checked');
+            if (checkedContainer) return true;
+
+            return false;
+        }
+
+        static enable(selector) {
+            const button = DOMUtils.querySelector(selector);
+            if (!button) {
+                console.warn(`Toggle button not found: ${selector}`);
+                return false;
+            }
+
+            if (!this.isEnabled(button)) {
+                button.click();
+            }
+
+            return true;
+        }
+
+        static async enableDefaultToggles() {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            this.enable(CONSTANTS.SELECTORS.SEARCH_TOGGLE);
+            this.enable(CONSTANTS.SELECTORS.URL_CONTEXT_TOGGLE);
+        }
+    }
+
     class SystemPromptManager {
         static async update(prompt) {
             // 只在URL包含new_chat时处理系统提示词
@@ -160,6 +203,8 @@
                     await new Promise(resolve => setTimeout(resolve, 500));
                     await this.closePanel();
                 }
+
+                await FeatureToggleManager.enableDefaultToggles();
                 
                 return true;
             } else {
@@ -223,6 +268,8 @@
         toggleGrounding() {
             const searchToggle = DOMUtils.querySelector(CONSTANTS.SELECTORS.SEARCH_TOGGLE);
             searchToggle?.click();
+            const urlContextToggle = DOMUtils.querySelector(CONSTANTS.SELECTORS.URL_CONTEXT_TOGGLE);
+            urlContextToggle?.click();
         }
 
         async createNewChat() {
@@ -280,7 +327,7 @@
 
             // 创建快捷键列表
             const shortcuts = [
-                { key: 'Ctrl/Cmd + i', description: 'Toggle Grounding' },
+                { key: 'Ctrl/Cmd + i', description: 'Toggle Grounding and URL context' },
                 { key: 'Ctrl/Cmd + j', description: 'New Chat' }
             ];
 
