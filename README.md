@@ -2,8 +2,6 @@
 
 *Chrome extension builds of this script are produced with [browser-script-to-extension](https://github.com/greenzorro/browser-script-to-extension).*
 
-Ask an agent to install it on your browser (see `# For Agent`). Afterwards you just use AI Studio as usual.
-
 **Make Google AI Studio easier to use**
 
 1. Automatically set Google AI Studio system prompt and enable Grounding / URL context;
