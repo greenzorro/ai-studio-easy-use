@@ -24,6 +24,8 @@ Ask an agent to install it on your browser (see `# For Agent`). Afterwards you j
 
 Created by [Victor42](https://victor42.work/) & [Agent Vik](https://github.com/agent-vik)
 
+---
+
 # For Agent
 
 Install this browser enhancement on the current machine, verify it injects on AI Studio, then hand everyday chatting shortcuts to the human. Batch install/login gates; avoid multi-round tug-of-war.
