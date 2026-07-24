@@ -1,10 +1,8 @@
 # ai-studio-easy-use
 
-[📃 Tampermonkey Script](https://greasyfork.org/en/scripts/523344-google-ai-studio-easy-use)
+*Chrome extension builds of this script are produced with [browser-script-to-extension](https://github.com/greenzorro/browser-script-to-extension).*
 
-[🌐 Chrome Web Store](https://chrome.google.com/webstore/detail/hoojepfagnefcmlfoggljejdfkkofinj) | [🗄️ Download ZIP](https://github.com/greenzorro/ai-studio-easy-use/raw/main/ai-studio-easy-use.zip) 
-
-*Extension automatically created with [browser-script-to-extension](https://github.com/greenzorro/browser-script-to-extension)*
+Ask an agent to install it on your browser (see `# For Agent`). Afterwards you just use AI Studio as usual.
 
 **Make Google AI Studio easier to use**
 
@@ -41,7 +39,7 @@ This tool runs in the browser. You can install it and drive a browser session; y
 ## Steps
 
 1. Prefer the fastest path that matches what you have:
-   - **Tampermonkey:** install root `ai-studio-easy-use.js` (or the GreasyFork link in this README)
+   - **Tampermonkey:** install root `ai-studio-easy-use.js` or https://greasyfork.org/en/scripts/523344-google-ai-studio-easy-use
    - **Extension:** unzip `ai-studio-easy-use.zip` if needed → `chrome://extensions` → Developer mode → **Load unpacked** → the extension folder (Web Store link is optional / human-clicky)
 2. **One handoff to the human:** approve extension/userscript install prompts; sign into Google AI Studio if the session is cold.
 3. With a browser tool (if available), open AI Studio, confirm the script is enabled for the tab, and smoke-test: system prompt / Grounding or URL-context defaults appear as designed; try `Ctrl/Cmd+I` and `Ctrl/Cmd+J`.
