@@ -25,3 +25,36 @@
 ---
 
 Created by [Victor42](https://victor42.work/) & [Agent Vik](https://github.com/agent-vik)
+
+# For Agent
+
+Install this browser enhancement on the current machine, verify it injects on AI Studio, then hand everyday chatting shortcuts to the human. Batch install/login gates; avoid multi-round tug-of-war.
+
+This tool runs in the browser. You can install it and drive a browser session; you cannot run it headlessly without a browser tool and a logged-in Google session.
+
+## Prerequisites
+
+- Chromium-based browser
+- Tampermonkey **or** willingness to load the repo ZIP as an unpacked extension
+- Access to `https://aistudio.google.com/*` or `https://ai.dev/*` (user may need to log in)
+
+## Steps
+
+1. Prefer the fastest path that matches what you have:
+   - **Tampermonkey:** install root `ai-studio-easy-use.js` (or the GreasyFork link in this README)
+   - **Extension:** unzip `ai-studio-easy-use.zip` if needed → `chrome://extensions` → Developer mode → **Load unpacked** → the extension folder (Web Store link is optional / human-clicky)
+2. **One handoff to the human:** approve extension/userscript install prompts; sign into Google AI Studio if the session is cold.
+3. With a browser tool (if available), open AI Studio, confirm the script is enabled for the tab, and smoke-test: system prompt / Grounding or URL-context defaults appear as designed; try `Ctrl/Cmd+I` and `Ctrl/Cmd+J`.
+4. Stop. Daily prompting and model work belong to the human.
+
+## Hand off to the human
+
+- Google account / 2FA
+- Ongoing use of shortcuts and prompt settings
+
+## Red lines
+
+- Do not collect or store Google credentials
+- Do not widen `@match` beyond AI Studio hosts
+- DOM/selector breakage: consult `notes.md` (maintainer memo), do not dump it into the README
+- Do not rebuild via `browser-script-to-extension` unless the human asked to republish
