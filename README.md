@@ -1,6 +1,10 @@
 # ai-studio-easy-use
 
-*Chrome extension builds of this script are produced with [browser-script-to-extension](https://github.com/greenzorro/browser-script-to-extension).*
+[📃 Tampermonkey Script](https://greasyfork.org/en/scripts/523344-google-ai-studio-easy-use)
+
+[🌐 Chrome Web Store](https://chrome.google.com/webstore/detail/hoojepfagnefcmlfoggljejdfkkofinj) | [🗄️ Download ZIP](https://github.com/greenzorro/ai-studio-easy-use/raw/main/ai-studio-easy-use.zip)
+
+*Extension automatically created with [browser-script-to-extension](https://github.com/greenzorro/browser-script-to-extension)*
 
 **Make Google AI Studio easier to use**
 
